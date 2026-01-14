@@ -4,7 +4,7 @@
 
   <script>
     const API_KEY = 'sk_live_51Hx7yqL9K8a9J0mN3qR2pL7wX9zA4vB6cD3eF1gH8iJ5kM2nO0pQ1rS3tU4vW5'; // Same as in Apps Script
-    const APPS_SCRIPT_URL = 'YOUhttps://script.google.com/macros/s/AKfycbxxt3Z7chL1RcKxvgTvYro3xZbdCZ4hSi3KHn3celHKv7d4ei-RSxLkOFFlRLQceB93/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxt3Z7chL1RcKxvgTvYro3xZbdCZ4hSi3KHn3celHKv7d4ei-RSxLkOFFlRLQceB93/exec';
     
     function addLineItem() {
       const div = document.createElement('div');
@@ -33,7 +33,7 @@
         notes: document.getElementById('notes').value
       };
       
-      await fetch(`${APPS_SCRIPT_URL}?key=${API_KEY}`, {
+      await fetch(`${https://script.google.com/macros/s/AKfycbxxt3Z7chL1RcKxvgTvYro3xZbdCZ4hSi3KHn3celHKv7d4ei-RSxLkOFFlRLQceB93/exec}?key=${sk_live_51Hx7yqL9K8a9J0mN3qR2pL7wX9zA4vB6cD3eF1gH8iJ5kM2nO0pQ1rS3tU4vW5}`, {
         method: 'POST',
         body: JSON.stringify(poData)
       });
@@ -50,7 +50,7 @@
           unit_cost: item.querySelector('.unit_cost').value,
           discount: item.querySelector('.discount').value
         };
-        await fetch(`${APPS_SCRIPT_URL}?key=${API_KEY}`, {
+        await fetch(`${https://script.google.com/macros/s/AKfycbxxt3Z7chL1RcKxvgTvYro3xZbdCZ4hSi3KHn3celHKv7d4ei-RSxLkOFFlRLQceB93/exec}?key=${sk_live_51Hx7yqL9K8a9J0mN3qR2pL7wX9zA4vB6cD3eF1gH8iJ5kM2nO0pQ1rS3tU4vW5}`, {
           method: 'POST',
           body: JSON.stringify(lineData)
         });
