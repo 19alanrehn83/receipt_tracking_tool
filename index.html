@@ -2,68 +2,66 @@
 <input type="file" class="receipt" accept="image/*" onchange="previewReceipt(this)">
 <img class="receipt-preview" style="max-width: 200px; display: none;">
 
-<script>
-// Updated addLineItem function
-function addLineItem() {
-  const div = document.createElement('div');
-  div.className = 'line-item';
-  div.innerHTML = `
-    <select class="category">...</select>
-    <input class="item_desc" placeholder="Item Description">
-    <input class="qty" type="number" placeholder="Quantity">
-    <input class="unit_cost" type="number" placeholder="Unit Cost" step="0.01">
-    <input class="discount" type="number" placeholder="Discount" step="0.01">
-    <label>Receipt: <input type="file" class="receipt" accept="image/*" onchange="previewReceipt(this)"></label>
-    <img class="receipt-preview" style="max-width: 200px; display: none; margin-top: 10px;">
-  `;
-  document.getElementById('line_items').appendChild(div);
-}
-
-// Preview receipt before upload
-function previewReceipt(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    const preview = input.parentElement.nextElementSibling;
-    reader.onload = e => {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-// Updated submitPO function
-async function submitPO() {
-  // ... (same PO header submission)
-  
-  // Process line items
-  for (let item of items) {
-    const fileInput = item.querySelector('.receipt');
-    let receiptData = null;
+  <script>
+    const API_KEY = 'sk_live_51Hx7yqL9K8a9J0mN3qR2pL7wX9zA4vB6cD3eF1gH8iJ5kM2nO0pQ1rS3tU4vW5'; // Same as in Apps Script
+    const APPS_SCRIPT_URL = 'YOUhttps://script.google.com/macros/s/AKfycbxxt3Z7chL1RcKxvgTvYro3xZbdCZ4hSi3KHn3celHKv7d4ei-RSxLkOFFlRLQceB93/exec';
     
-    if (fileInput.files[0]) {
-      receiptData = await new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = e => resolve({
-          name: fileInput.files[0].name,
-          mime: fileInput.files[0].type,
-          data: e.target.result.split(',')[1] // Remove data URL prefix
-        });
-        reader.readAsDataURL(fileInput.files[0]);
-      });
+    function addLineItem() {
+      const div = document.createElement('div');
+      div.className = 'line-item';
+      div.innerHTML = `
+        <select class="category">
+          <option>Commissions</option><option>Marketing</option>
+          <option>Inventory</option><option>Supplies</option>
+        </select>
+        <input class="item_desc" placeholder="Item Description">
+        <input class="qty" type="number" placeholder="Quantity">
+        <input class="unit_cost" type="number" placeholder="Unit Cost" step="0.01">
+        <input class="discount" type="number" placeholder="Discount" step="0.01">
+      `;
+      document.getElementById('line_items').appendChild(div);
     }
     
-    const lineData = {
-      type: 'line_item',
-      po_number: poData.po_number,
-      // ... other fields
-      receipt: receiptData
-    };
+    async function submitPO() {
+      const poData = {
+        type: 'po',
+        po_number: document.getElementById('po_number').value,
+        date: document.getElementById('date').value,
+        vendor: document.getElementById('vendor').value,
+        shipping: document.getElementById('shipping').value,
+        payment_method: document.getElementById('payment_method').value,
+        notes: document.getElementById('notes').value
+      };
+      
+      await fetch(`${APPS_SCRIPT_URL}?key=${API_KEY}`, {
+        method: 'POST',
+        body: JSON.stringify(poData)
+      });
+      
+      // Submit line items
+      const items = document.querySelectorAll('.line-item');
+      for (let item of items) {
+        const lineData = {
+          type: 'line_item',
+          po_number: poData.po_number,
+          category: item.querySelector('.category').value,
+          item_description: item.querySelector('.item_desc').value,
+          quantity: item.querySelector('.qty').value,
+          unit_cost: item.querySelector('.unit_cost').value,
+          discount: item.querySelector('.discount').value
+        };
+        await fetch(`${APPS_SCRIPT_URL}?key=${API_KEY}`, {
+          method: 'POST',
+          body: JSON.stringify(lineData)
+        });
+      }
+      
+      alert('PO Submitted!');
+      location.reload();
+    }
     
-    await fetch(`$https://script.google.com/macros/s/AKfycbxnywEV34YcyG3txdSrRQLhFOt9lt246HE9mDSuEb2Lvgc3wrhf9ejibirzw1AMUW1D/exec?key=${sk_live_51Hx7yqL9K8a9J0mN3qR2pL7wX9zA4vB6cD3eF1gH8iJ5kM2nO0pQ1rS3tU4vW5}`, {
-      method: 'POST',
-      body: JSON.stringify(lineData)
-    });
-  }
-}
-</script>
+    // Add first line item on load
+    addLineItem();
+  </script>
+</body>
+</html>
