@@ -8,7 +8,7 @@
       --bg-primary: #ffffff;
       --bg-secondary: #f5f5f5;
       --bg-tertiary: #e0e0e0;
-      --accent-pink: #ff006e; /* Hot pink */
+      --accent-pink: #ff006e;
       --text-primary: #000000;
       --text-secondary: #444444;
       --border-color: #cccccc;
@@ -299,6 +299,17 @@
     const API_KEY = 'sk_live_51Hx7yqL9K8a9J0mN3qR2pL7wX9zA4vB6cD3eF1gH8iJ5kM2nO0pQ1rS3tU4vW5';
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwiA1-kxlsw_6BuGhAosOe9jW0BLh87k31GAVIO_BnFFX4gefhAzuVp8K_8Rvy8k0AV/exec';
 
+    // Simple password protection
+    const TEAM_PASSWORD = 'WWD2024!'; // Change this!
+    if (!sessionStorage.getItem('auth')) {
+      const prompt = window.prompt('Enter team password:');
+      if (prompt !== TEAM_PASSWORD) {
+        document.body.innerHTML = '<div style="text-align:center; margin-top:5rem; font-size:2rem; color:#ff006e;">Access Denied</div>';
+        throw new Error('Unauthorized');
+      }
+      sessionStorage.setItem('auth', 'true');
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('date').valueAsDate = new Date();
       addLineItem();
@@ -425,10 +436,13 @@
 
         const response = await fetch(`${APPS_SCRIPT_URL}?key=${API_KEY}`, {
           method: 'POST',
-          body: JSON.stringify(poData)
+          body: JSON.stringify(poData),
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' }
         });
 
-        if (!response.ok) throw new Error('PO header failed');
+        const result = await response.json();
+        if (result.error) throw new Error(result.error);
 
         // Submit line items
         for (let i = 0; i < lineItems.length; i++) {
@@ -476,7 +490,9 @@
 
           await fetch(`${APPS_SCRIPT_URL}?key=${API_KEY}`, {
             method: 'POST',
-            body: JSON.stringify(lineData)
+            body: JSON.stringify(lineData),
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json' }
           });
         }
 
@@ -484,11 +500,10 @@
         setTimeout(() => location.reload(), 2000);
 
       } catch (error) {
-        console.error(error);
+        console.error('Submission error:', error);
         showStatus(`Submission failed: ${error.message}`, false);
       }
     }
   </script>
 </body>
 </html>
-
